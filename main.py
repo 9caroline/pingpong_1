@@ -7,10 +7,10 @@ window = display.set_mode((700, 500), vsync = 1)
 display.set_caption("Pingpong")
 
 game = True
-finish = False
+finish = 1
 
 background = transform.scale(image.load("background.jpg"), (window.get_width(), window.get_height()))
-img_racket = transform.scale(image.load("racket.png"), (100, 100))
+img_racket = transform.scale(image.load("racket.png"), (20, 100))
 img_ball = transform.scale(image.load("ball.png"), (60, 60))
 
 class GameSprite(sprite.Sprite):
@@ -42,26 +42,57 @@ class Player(GameSprite):
 class Ball(GameSprite):
     def __init__(self, img, x, y, speed):
         super().__init__(img, x, y, speed)
-        self.k_up = k_up
-        self.k_down = k_down
+
+    
+    def control_ball(self):
+        self.pos_x += self.speed
+        self.pos_y += self.speed
+
+
+
+        #self.pos_y += self.speed
+        #if self.pos_y > window.get_height():
+            #self.pos_y = randint(-220, -80)
+            #self.pos_x = randint(0, window.get_width() - 100)
+        #self.rect.topleft = (self.pos_x, self.pos_y)
+        pass
+        
 
 racket_right = Player(img_racket, 20, 200, 0.6, K_w, K_s)
-racket_left = Player(img_racket, 590, 200, 0.6, K_UP, K_DOWN)
-ball = GameSprite(img_ball, 350, 200, 0.6)
+racket_left = Player(img_racket, 660, 200, 0.6, K_UP, K_DOWN)
+ball = Ball(img_ball, 310, 200, 0.3)
+
+
+font1 = font.SysFont("Arial", 50)
 
 while game:
     for e in event.get():
         if e.type == QUIT:
             game = False
 
-    if not finish:
+    if finish == 1:
         racket_right.control()
         racket_left.control()
+        ball.control_ball()
 
         window.blit(background, (0, 0))
         racket_right.draw()
         racket_left.draw()
         ball.draw()
+
+
+
+    elif finish == 2:
+        label1 = font1.render(f"Победа правого участника. Поздравляем!", True, "#ea94ff")
+        window.blit(label1, (125, 320))
+        label2 = font1.render(f"Для перезапуска игры нажмите пробел.", True, "#ea94ff")
+        window.blit(label2, (125, 400))
+
+    elif finish == 3:
+        label1 = font1.render(f"Победа левого участника. Поздравляем!", True, "#ea94ff")
+        window.blit(label1, (125, 320))
+        label2 = font1.render(f"Для перезапуска игры нажмите пробел.", True, "#ea94ff")
+        window.blit(label2, (125, 400))
 
     display.update()
 
