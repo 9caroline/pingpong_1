@@ -40,30 +40,59 @@ class Player(GameSprite):
 
 
 class Ball(GameSprite):
-    def __init__(self, img, x, y, speed):
-        super().__init__(img, x, y, speed)
+    def __init__(self, img, x, y, speed_x, speed_y):
+        super().__init__(img, x, y)
+        self.speed_x = speed_x
+        self.speed_y = speed_y
 
     
     def control_ball(self):
-        self.pos_x += self.speed
-        self.pos_y += self.speed
+        global finish
+        if finish == 1:
+            self.pos_x += self.speed_x
+            self.pos_y += self.speed_y
+            self.rect.x = self.pos_x
+            self.rect.y = self.pos_y
+            if self.pos_x >= window.get_width() - 60:
+                finish = 3
+
+            elif self.pos_x <= 0:
+                finish = 2
+
+            elif self.pos_y >= window.get_height() - 60 or self.pos_y <= 0:
+                self.speed_y *= -1
+
+            elif sprite.collide_rect(racket_left, ball):
+                self.speed_x *= -1
+
+            elif sprite.collide_rect(racket_right, ball):
+                self.speed_x *= -1
+            
+            else:
+                pass
 
 
 
-        #self.pos_y += self.speed
-        #if self.pos_y > window.get_height():
-            #self.pos_y = randint(-220, -80)
-            #self.pos_x = randint(0, window.get_width() - 100)
-        #self.rect.topleft = (self.pos_x, self.pos_y)
-        pass
-        
 
-racket_right = Player(img_racket, 20, 200, 0.6, K_w, K_s)
-racket_left = Player(img_racket, 660, 200, 0.6, K_UP, K_DOWN)
-ball = Ball(img_ball, 310, 200, 0.3)
+def new_game():
+    global finish
+    finish = 1
+    ball.pos_x = 310
+    ball.pos_y = 75
+    racket_left.pos_x = 65
+    racket_left.pos_y = 200
+    racket_right.pos_x = 625
+    racket_right.pos_y = 200
 
 
-font1 = font.SysFont("Arial", 50)
+
+
+racket_left = Player(img_racket, 65, 200, 0.6, K_w, K_s)
+racket_right = Player(img_racket, 625, 200, 0.6, K_UP, K_DOWN)
+ball = Ball(img_ball, 310, 75, 0.3, 0.3)
+
+
+font1 = font.SysFont("Arial", 25)
 
 while game:
     for e in event.get():
@@ -71,28 +100,38 @@ while game:
             game = False
 
     if finish == 1:
-        racket_right.control()
         racket_left.control()
+        racket_right.control()
         ball.control_ball()
 
         window.blit(background, (0, 0))
-        racket_right.draw()
         racket_left.draw()
+        racket_right.draw()
         ball.draw()
 
 
 
     elif finish == 2:
-        label1 = font1.render(f"Победа правого участника. Поздравляем!", True, "#ea94ff")
-        window.blit(label1, (125, 320))
-        label2 = font1.render(f"Для перезапуска игры нажмите пробел.", True, "#ea94ff")
-        window.blit(label2, (125, 400))
+        window.blit(background, (0, 0))
+        label1 = font1.render(f"Победа правого участника. Поздравляем!", True, "#0300b8")
+        window.blit(label1, (20, 100))
+        label2 = font1.render(f"Для перезапуска игры нажмите пробел.", True, "#0300b8")
+        window.blit(label2, (25, 250))
+        keys = key.get_pressed()
+        if keys[K_SPACE]:
+            new_game()
 
     elif finish == 3:
-        label1 = font1.render(f"Победа левого участника. Поздравляем!", True, "#ea94ff")
-        window.blit(label1, (125, 320))
-        label2 = font1.render(f"Для перезапуска игры нажмите пробел.", True, "#ea94ff")
-        window.blit(label2, (125, 400))
+        window.blit(background, (0, 0))
+        label1 = font1.render(f"Победа левого участника. Поздравляем!", True, "#0300b8")
+        window.blit(label1, (20, 100))
+        label2 = font1.render(f"Для перезапуска игры нажмите пробел.", True, "#0300b8")
+        window.blit(label2, (25, 250))
+        keys = key.get_pressed()
+        if keys[K_SPACE]:
+            new_game()
+    else:
+        pass
 
     display.update()
 
